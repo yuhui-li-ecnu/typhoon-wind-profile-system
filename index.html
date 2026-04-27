@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="format-detection" content="telephone=no">
-    <title>台风风廓线模型参数查询系统</title>
+    <title>台风风廓线模型参数查询系统 | 下层对流层风场特征研究</title>
     <!-- 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -36,7 +36,6 @@
         }
 
         body {
-            /* 英文数字使用新罗马，中文回退系统无衬线字体 */
             font-family: 'Times New Roman', 'Microsoft YaHei', 'PingFang SC', sans-serif;
             background-color: var(--bg-body);
             color: var(--text-main);
@@ -50,13 +49,21 @@
         }
 
         /* =========================================
-           2. 页面布局与 Header
+           2. 页面布局与 Header (带气象背景大图)
            ========================================= */
         .navbar {
             background-color: var(--primary-color);
+            /* 叠加深色渐变层以保证文字清晰度，底层为真实背景图 */
+            background-image: 
+                linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 58, 138, 0.8) 100%),
+                url("https://images.unsplash.com/photo-1527482797697-8795b05a13fe?q=80&w=2000&auto=format&fit=crop"); /* 这里默认放了一张高质量暗色风暴图，你可以随时替换 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: #ffffff;
-            padding: 24px 0;
-            box-shadow: var(--shadow-md);
+            padding: 75px 0; /* 加大 padding，打造专业大屏 Banner 感 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            position: relative;
         }
 
         .navbar-container {
@@ -65,22 +72,26 @@
             padding: 0 24px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+            position: relative;
+            z-index: 2;
         }
 
         .navbar-title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: 600;
             font-family: 'Microsoft YaHei', sans-serif;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
         .navbar-subtitle {
-            font-size: 1.05rem;
-            color: #bfdbfe;
+            font-size: 1.1rem;
+            color: #dbeafe;
+            max-width: 800px;
         }
 
         .main-container {
@@ -90,7 +101,7 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
-            min-height: calc(100vh - 250px);
+            min-height: calc(100vh - 350px);
         }
 
         .card {
@@ -100,6 +111,8 @@
             border: 1px solid var(--border-color);
             padding: 32px;
             transition: box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .card:hover {
@@ -120,7 +133,7 @@
         }
 
         /* =========================================
-           3. 说明与提示区块
+           4. 说明与提示区块
            ========================================= */
         .info-alert {
             background-color: #eff6ff;
@@ -148,7 +161,7 @@
         }
 
         /* =========================================
-           4. 查询交互区域 (Tabs & Forms)
+           5. 查询交互区域 (Tabs & Forms)
            ========================================= */
         .tabs {
             display: flex;
@@ -259,7 +272,7 @@
         }
 
         /* =========================================
-           5. 查询结果区域
+           6. 查询结果区域
            ========================================= */
         #resultSection {
             display: none; /* 默认隐藏 */
@@ -364,7 +377,7 @@
         }
 
         /* =========================================
-           6. 学术参考表格 (三线表风格)
+           7. 学术参考表格 (三线表风格)
            ========================================= */
         #gb50009Table {
             display: none;
@@ -418,7 +431,7 @@
         }
 
         /* =========================================
-           7. Footer 页脚 (整合联系方式与访问量)
+           8. Footer 页脚 (全局访问量)
            ========================================= */
         .footer {
             background-color: #1f2937;
@@ -453,23 +466,12 @@
             color: #9ca3af;
         }
 
-        .stat-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background-color: rgba(255,255,255,0.1);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-family: 'Times New Roman', serif;
-            font-size: 1.1rem;
-            color: #fff;
+        .stat-badge-container {
             margin-top: 12px;
-            cursor: pointer;
-        }
-
-        .stat-badge span {
-            font-weight: bold;
-            letter-spacing: 1px;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+            display: inline-block;
         }
 
         /* 响应式适配 */
@@ -493,6 +495,9 @@
             .footer-container {
                 flex-direction: column;
             }
+            .navbar-title {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
@@ -501,14 +506,14 @@
     <!-- 顶部导航区 -->
     <header class="navbar">
         <div class="navbar-container">
-            <h1 class="navbar-title"><i class="fas fa-wind"></i> 台风风廓线模型参数查询系统</h1>
-            <p class="navbar-subtitle">基于中国东南部对流层低层 (100–2000 m) 台风风速剖面特征研究</p>
+            <h1 class="navbar-title"><i class="fas fa-satellite-dish"></i> 台风风廓线模型参数查询系统</h1>
+            <p class="navbar-subtitle">基于中国东南部对流层低层 (100–2000 m) 台风风速剖面特征反演与研究</p>
         </div>
     </header>
 
     <!-- 主体内容区 -->
     <main class="main-container">
-        
+
         <!-- 数据来源系统说明 -->
         <section class="card">
             <div class="info-alert">
@@ -569,7 +574,7 @@
                     </div>
                 </div>
                 <button class="btn-submit" onclick="queryParametersByDistance()">
-                    <i class="fas fa-search"></i> 获取参数
+                    <i class="fas fa-search"></i> 获取反演参数
                 </button>
             </div>
             
@@ -602,7 +607,7 @@
                     </div>
                 </div>
                 <button class="btn-submit" onclick="queryParametersByLandcover()">
-                    <i class="fas fa-search"></i> 获取参数
+                    <i class="fas fa-search"></i> 获取反演参数
                 </button>
             </div>
         </section>
@@ -662,23 +667,23 @@
 
     </main>
 
-    <!-- 页脚与统息信息 -->
+    <!-- 页脚与统计信息 -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-section">
-                <h4>科研联系方式</h4>
+                <h4><i class="fas fa-envelope"></i> 科研联系方式</h4>
                 <div class="footer-info">
-                    <p><i class="fas fa-user"></i> 汤胜茗 (tangsm@typhoon.org.cn)</p>
-                    <p><i class="fas fa-user"></i> 李玉辉 (52273901008@stu.ecnu.edu.cn)</p>
+                    <p>汤胜茗：tangsm@typhoon.org.cn</p>
+                    <p>李玉辉：52273901008@stu.ecnu.edu.cn</p>
                 </div>
             </div>
-            <div class="footer-section">
-                <h4>平台访问统计</h4>
+            <div class="footer-section" style="text-align: right;">
+                <h4><i class="fas fa-chart-line"></i> 平台访问统计</h4>
                 <div class="footer-info">
-                    <p>感谢使用台风风廓线模型参数查询系统。</p>
-                    <div class="stat-badge" id="visitorCounter" title="点击查看详情">
-                        <i class="fas fa-chart-line" style="color: #fff;"></i>
-                        TOTAL VISITS: <span id="visitorCount">0</span>
+                    <p style="color: #9ca3af; font-size: 0.85rem;">全局累计页面访问量 (PV)</p>
+                    <div class="stat-badge-container">
+                        <!-- 使用开源的纯静态全局计数器服务，每次加载都会累加 -->
+                        <img src="https://visitor-badge.laobi.icu/badge?page_id=liyh19951001-ops.typhoon-wind-profile-system&left_text=Total%20Visits&right_color=%232563eb" alt="Visitor Count Badge" />
                     </div>
                 </div>
             </div>
@@ -945,10 +950,7 @@
             resultContent.innerHTML = html;
         }
 
-        // ==========================================
-        //  辅助功能 (回车查询与访问统计)
-        // ==========================================
-
+        // 回车快捷查询
         document.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 const activeForm = document.querySelector('.query-form.active');
@@ -957,68 +959,6 @@
                 } else {
                     queryParametersByLandcover();
                 }
-            }
-        });
-        
-        function initVisitorCounter() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const isFromQR = urlParams.get('qr') === '1' || localStorage.getItem('typhoon_wind_profile_qr_visit') === 'true';
-            
-            if (isFromQR) {
-                const qrTime = localStorage.getItem('typhoon_wind_profile_qr_time');
-                if (qrTime) localStorage.setItem('typhoon_wind_profile_session_start', qrTime);
-                localStorage.removeItem('typhoon_wind_profile_qr_visit');
-                localStorage.removeItem('typhoon_wind_profile_qr_time');
-            } else {
-                localStorage.setItem('typhoon_wind_profile_session_start', Date.now().toString());
-            }
-            
-            setTimeout(checkVisitDuration, 5000);
-            const visitCount = localStorage.getItem('typhoon_wind_profile_visits') || '0';
-            const visitorElement = document.getElementById('visitorCount');
-            if (visitorElement) {
-                animateCounter(visitorElement, 0, parseInt(visitCount), 2000);
-            }
-        }
-        
-        function checkVisitDuration() {
-            const sessionStart = localStorage.getItem('typhoon_wind_profile_session_start');
-            if (!sessionStart) return;
-            if ((Date.now() - parseInt(sessionStart)) >= 5000) {
-                recordVisit();
-            }
-        }
-        
-        function recordVisit() {
-            let visitCount = parseInt(localStorage.getItem('typhoon_wind_profile_visits') || '0') + 1;
-            localStorage.setItem('typhoon_wind_profile_visits', visitCount.toString());
-            localStorage.setItem('typhoon_wind_profile_last_visit', new Date().toDateString());
-            
-            const visitorElement = document.getElementById('visitorCount');
-            if (visitorElement) animateCounter(visitorElement, 0, visitCount, 2000);
-        }
-        
-        function animateCounter(element, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
-                element.textContent = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                if (progress < 1) window.requestAnimationFrame(step);
-            };
-            window.requestAnimationFrame(step);
-        }
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            initVisitorCounter();
-            const visitorCounter = document.getElementById('visitorCounter');
-            if (visitorCounter) {
-                visitorCounter.addEventListener('click', function() {
-                    const count = localStorage.getItem('typhoon_wind_profile_visits') || 0;
-                    const lastDate = localStorage.getItem('typhoon_wind_profile_last_visit') || '今天';
-                    alert(`【平台访问统计】\n总计交互访客: ${count.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}\n最后统计时间: ${lastDate}`);
-                });
             }
         });
     </script>
