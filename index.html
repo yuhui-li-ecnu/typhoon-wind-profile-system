@@ -526,6 +526,7 @@
         <section class="card">
             <div class="info-alert">
                 <strong><i class="fas fa-database"></i> 数据基准与来源说明</strong>
+                <ol>
                     <li><strong>风廓线观测数据</strong>：来源于中国气象局（CMA）气象大数据云平台，具有 30 分钟时间分辨率与 60 米垂直分辨率。</li>
                     <li><strong>台风路径与强度信息</strong>：采用中国气象局热带气旋最佳路径数据集（CMA Best Track）及国际气候管理最佳路径档案（IBTrACS）。</li>
                     <li><strong>地表覆盖类型数据</strong>：采用中国科学院空天信息创新研究院发布的 2020 年全球 30 米分辨率地表覆盖精细分类产品（GLC_FCS30-2020）。</li>
@@ -535,7 +536,7 @@
 
         <!-- 查询交互区 -->
         <section class="card">
-            <h2 class="section-title"><i class="fas fa-sliders-h"></i> 参数反演查询</h2>
+            <h2 class="section-title"><i class="fas fa-sliders-h"></i> 参数查询</h2>
             
             <!-- 查询维度切换 Tabs -->
             <div class="tabs">
@@ -580,7 +581,7 @@
                     </div>
                 </div>
                 <button class="btn-submit" onclick="queryParametersByDistance()">
-                    <i class="fas fa-search"></i> 获取反演参数
+                    <i class="fas fa-search"></i> 获取风廓线模型参数
                 </button>
             </div>
             
@@ -613,7 +614,7 @@
                     </div>
                 </div>
                 <button class="btn-submit" onclick="queryParametersByLandcover()">
-                    <i class="fas fa-search"></i> 获取反演参数
+                    <i class="fas fa-search"></i> 获取风廓线模型参数
                 </button>
             </div>
         </section>
@@ -621,7 +622,7 @@
         <!-- 结果展示区 -->
         <section id="resultSection" class="card">
             <h2 class="section-title" style="color: #047857; border-bottom-color: #d1fae5;">
-                <i class="fas fa-check-circle"></i> 反演结果
+                <i class="fas fa-check-circle"></i> 查询结果
             </h2>
             <div id="resultContent">
                 <!-- JS 动态注入结果内容 -->
@@ -927,7 +928,7 @@
                     <div class="formula-desc">${profileData.formula.explanation}</div>
                 </div>
                 
-                <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text-main);">模型参数反演（平均值±标准差）</h3>
+                <h3 style="margin-bottom: 12px; font-size: 1.1rem; color: var(--text-main);">模型参数值（平均值±标准差）</h3>
                 <div class="params-grid">
             `;
             
